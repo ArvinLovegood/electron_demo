@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>数据库工具</title>
+    <link rel="stylesheet" type="text/css" href="./res/bootstrap-3.3.5/css/bootstrap-theme.min.css" />
+    <link rel="stylesheet" type="text/css" href="./res/bootstrap-3.3.5/css/bootstrap.min.css" />
+    <link href="./res/bootstrap-table-master/dist/bootstrap-table.min.css" rel="stylesheet">
+
+    <script type="text/javascript" src="./res/jquery.min.js"></script>
+    <script type="text/javascript" src="./res/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="./res/bootstrap-table-master/dist/bootstrap-table.min.js"></script>
+    <script type="text/javascript" src="./res/bootstrap-table-master/dist/locale/bootstrap-table-zh-CN.min.js"></script>
+
+</head>
+<body>
+<div class="container">
+ <form class="form-horizontal">
+  <div class="form-group">
+    <label for="host" class="col-sm-2 control-label">IP</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" value="192.168.0.82" id="host" placeholder="IP">
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="user" class="col-sm-2 control-label">用户名</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" value="root" id="user" placeholder="用户名">
+    </div>
+  </div>
+    <div class="form-group">
+    <label for="password" class="col-sm-2 control-label">密码</label>
+    <div class="col-sm-10">
+      <input type="password" class="form-control" value="hzx2014**" id="password" placeholder="密码">
+    </div>
+  </div>
+      <div class="form-group">
+    <label for="database" class="col-sm-2 control-label">数据库</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" value="app" id="database" placeholder="数据库">
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-10">
+      <button type="button" class="btn btn-info"  onclick="openConn()">连接</button>
+      <button type="button" class="btn btn-warning" onclick="closeConn()" >断开</button>
+    </div>
+  </div>
+</form>
+
+		<div id="res" class="row">
+		 <div class="col-md-3">
+		 <div class="panel panel-success">
+		 <div class="panel-heading">表</div>
+			 <div id="dbTables" class="list-group">
+				  
+			</div>
+		</div>
+		 </div>
+		 <div class="col-md-9">
+			<div class="panel panel-success">
+				<div class="panel-heading">查询</div>
+				<div class="panel-body">
+					<div class="input-group">
+						<input id="sql" type="text" class="form-control"
+							placeholder="请输入标准sql"> <span class="input-group-btn">
+							<button class="btn btn-info" type="button"
+								onclick="query($('#sql').val())">查询</button>
+						</span>
+					</div>
+					<table id="dataTable" class='table table-striped table-bordered'>
+					<thead>
+						<tr></tr>
+					</thead>
+					<tbody>
+					</tbody>
+				</table>
+				</div>
+			</div>
+		 </div>
+		</div>
+</div>
+   <script>
+var mysql = require('mysql');
+var connection;
+
+openConn();
+
+$('#sql').bind('keypress',function(event){
+    if(event.keyCode == "13")    
+    {
+    	query($('#sql').val());
+    }
+});
+
+function openConn(){
+/*  console.log( $("#host").val());
+    console.log( $("#user").val());
+    console.log( $("#password").val());
+    console.log( $("#database").val());
+ */
+ 
+ 
+	connection = mysql.createConnection(
+	    {
+	    host     : $("#host").val(),
+	    user     : $("#user").val(),
+	    password : $("#password").val(),
+	    database : $("#database").val(),
+	    }
+	);
+	connection.connect();  
+ console.log( "----------------打开数据库连接----------------------");
+ 
+	connection.query("show tables", function(err, rows, fields) {
+	    if (err) throw err;
+	    $("#dbTables").html("");
+	    $.each(rows,function(i,o){	    	
+	    	  $.each(o,function(j,v){
+		    	var a='<a  id="'+v+'" href="javascript:void(0)" class="list-group-item" onclick="showtableInfo(\''+v+'\')" >'+v+'</a>';
+		        $("#dbTables").append(a);
+	    	  });	    	
+	    })
+	    
+	});	
+ 
+}
+
+function showtableInfo(t){
+	$("#sql").val("desc	 "+ t);
+	$("#"+t).addClass("active").siblings().removeClass("active");
+	query("desc	"+ t);
+}
+
+function query(queryString){
+
+	if(connection==undefined||connection.state=="disconnected"){
+		openConn();
+	}
+	
+	 $("#dataTable thead tr ").html("");
+	 $("#dataTable tbody").html("");  
+	connection.query(queryString, function(err, rows, fields) {
+    if (err) throw err;
+            $.each(fields,function(k,o){
+        	 $("#dataTable thead tr ").append("<td>"+o.name+"</td>");
+        })
+    for (var i in rows) {
+    		var tr="<tr>";
+    	$.each(fields,function(j,o){
+    		tr+=("<td>"+rows[i][o.name]+"</td>");
+       });
+    	tr+="</tr>";
+        $("#dataTable tbody").append(tr);
+    }
+});	
+} 
+
+
+
+
+
+function closeConn(){
+    connection.end();
+} 
+ 
+   </script>
+</body>
+</html>

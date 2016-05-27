@@ -1,0 +1,48 @@
+<!DOCTYPE HTML>
+<html>
+ <head>
+  <title>分段工具</title>
+   <meta charset="UTF-8">
+       <link rel="stylesheet" type="text/css" href="./res/bootstrap-3.3.5/css/bootstrap-theme.min.css" />
+    <link rel="stylesheet" type="text/css" href="./res/bootstrap-3.3.5/css/bootstrap.min.css" />
+    <link href="./res/bootstrap-table-master/dist/bootstrap-table.min.css" rel="stylesheet">
+
+    <script type="text/javascript" src="./res/jquery.min.js"></script>
+    <script type="text/javascript" src="./res/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="./res/bootstrap-table-master/dist/bootstrap-table.min.js"></script>
+    <script type="text/javascript" src="./res/bootstrap-table-master/dist/locale/bootstrap-table-zh-CN.min.js"></script>
+ </head>
+
+ <body class="container">
+  最小值：<input id="min" value="1">
+ 最大值：<input id="max" value="10">
+分段数：<input id="ffds" value="5">
+<br>
+<button type='button'  onclick='fd()' >获取分段</button>
+<button type='button'  onclick='$("#res").html("")' >清空</button>
+<hr>
+<div id="res" style='background-color:#ccc'></div>
+
+<script type="text/javascript">
+function fd(){
+	var min=$("#min").val();
+	var max=$("#max").val();
+	var ffds=$("#ffds").val();
+	var d=(max-min)/ffds;
+	
+		$("#res").append("分段大小:"+d+"<br>");
+	$("#res").append("<hr>")
+	var start=new Number(min);
+	for(var i=1;i<=ffds;i++){		
+		var end=new Number(start+d);
+		console.log(start+"~"+end);
+		$("#res").append(""+start+" ~ "+end+"<br>");
+		start=end;
+	}
+
+	$("#res").append("<hr>")
+
+}
+</script>
+ </body>
+</html>

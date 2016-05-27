@@ -1,3 +1,9 @@
+oschina_arvinlovegood
+oschina_arvinlovegood.pub
+
+#node.js
+node_modules/*
+
 # Windows image file caches
 Thumbs.db
 ehthumbs.db
